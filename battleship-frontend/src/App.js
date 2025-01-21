@@ -28,9 +28,10 @@ const Battleship = () => {
     });
 
     if(response.ok){
-      const updatedShips = await response.json();
+      const { message, ships:updatedShips } = await response.json();
       setShips(updatedShips);
       setDestroyedShipCoordinates((prev) => [...prev, {x, y}]);
+      setMessage(message);
     }
   }
 
@@ -55,9 +56,11 @@ const Battleship = () => {
 
   const isPartOfShips = (x, y, allShips) => {
     for(let shipName in allShips){
-      const ship = allShips[shipName].coordinates;
-      if(ship.some((block) => block.x === x && block.y ===y)){
-        return shipName;
+      const ship = allShips[shipName];
+      if(ship && ship.coordinates){
+        if(ship.coordinates.some((block) => block.x === x && block.y === y)){
+          return shipName;
+        }
       }
     }
     return null;
@@ -83,7 +86,7 @@ const Battleship = () => {
             onClick={() => {
               if(shipName){
                 deleteCoordinate(shipName, x, y);
-                setMessage('You hit a ship!');
+                //setMessage('You hit a ship!');
               }
               else attack(x, y);
             }}
