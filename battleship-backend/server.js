@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 
 const isOccupied = (position, occupiedPositions) => 
     occupiedPositions.some((occupied) => occupied.x === position.x && occupied.y === position.y);
@@ -85,9 +87,22 @@ const generateAllShips = () =>{
     return ships;
 }
 
+let ships = generateAllShips();
+
 app.get('/ship', (req, res) => {
-    const allShips = generateAllShips();
-    res.json(allShips);
+    ships = generateAllShips();
+    res.json(ships);
+})
+
+app.delete('/ship/:shipName/delete', (req, res) => {
+    const {shipName} = req.params;
+    const {x, y} = req.body;
+
+    ships[shipName].coordinates = ships[shipName].coordinates.filter(
+        (coordinate) => coordinate.x !== x || coordinate.y !== y
+    );
+
+    res.json(ships);
 })
 
 const PORT = 5000;

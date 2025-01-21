@@ -16,33 +16,54 @@ const Battleship = () => {
     Array.from({length: 10}, (_, y) => ({x, y}))
   );
 
-  const isPartOfShips = (x, y, allShips) => {
-    for(let shipIndex in allShips){
-      const ship = allShips[shipIndex].coordinates;
-      if(ship.some((block) => block.x === x && block.y ===y)){
-        return true;
-      }
+  const deleteCoordinate = async (shipName, x, y) => {
+    const response = await fetch(`http://localhost:5000/ship/${shipName}/delete`, {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json'},
+      body: JSON.stringify({x, y})
+    });
+
+    if(response.ok){
+      const updatedShips = await response.json();
+      setShips(updatedShips);
     }
   }
 
-  console.log(ships);
+  const isPartOfShips = (x, y, allShips) => {
+    for(let shipName in allShips){
+      const ship = allShips[shipName].coordinates;
+      if(ship.some((block) => block.x === x && block.y ===y)){
+        return shipName;
+      }
+    }
+    return null;
+  }
+
+  //console.log(ships);
 
   return (
     <div className="App">
       <h1>Battleship Game</h1>
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
-        {grid.flat().map(({x, y}) => (
+        {grid.flat().map(({x, y}) => {
+          const shipName = isPartOfShips(x, y, ships);
+          return (
           <button
             key={`${x}-${y}`}
             style={{
               width: 70,
               height: 70,
-              backgroundColor: isPartOfShips(x, y, ships) ? 'black' : 'white'
+              backgroundColor: shipName ? 'black' : 'white'
             }}
-            //onClick={console.log(x, y)}
+            onClick={() => {
+              if(shipName){
+                deleteCoordinate(shipName, x, y);
+              }
+            }}
             >
           </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
