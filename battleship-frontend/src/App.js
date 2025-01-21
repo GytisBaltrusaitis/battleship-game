@@ -1,23 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
+
+  const grid = Array.from({length: 10}, (_, x) =>
+    Array.from({length: 10}, (_, y) => ({x, y}))
+  );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Battleship Game</h1>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
+        {grid.flat().map(({x, y}) => (
+          <button
+            key={`${x}-${y}`}
+            style={{
+              width: 70,
+              height: 70,
+              backgroundColor: 'white'
+            }}
+            >
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
