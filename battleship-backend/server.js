@@ -4,6 +4,31 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+const isOccupied = (position, occupiedPositions) => 
+    occupiedPositions.some((occupied) => occupied.x === position.x && occupied.y === position.y);
+
+
+const unavailablePositions = (position, occupiedPositions) => {
+    const surroundingPositions = [
+        {x: position.x - 1, y: position.y - 1}, //topleft
+        {x: position.x, y: position.y - 1}, //top
+        {x: position.x + 1, y: position.y - 1}, //topright
+        {x: position.x - 1, y: position.y}, //left
+        {x: position.x + 1, y: position.y},// right
+        {x: position.x - 1, y: position.y + 1},//bottom left
+        {x: position.x + 1, y: position.y + 1},//bottom right
+        {x: position.x, y: position.y + 1}//bottom
+    ];
+
+    surroundingPositions.forEach((surrounding) => {
+        if(surrounding.x >= 0 && surrounding.x < 10 &&
+            surrounding.y >= 0 && surrounding.y < 10 &&
+            !isOccupied(surrounding, occupiedPositions)){
+                occupiedPositions.push(surrounding);
+        }
+    });
+};
+
 const generateShip = (size, occupiedPositions) => {
 
     let ship = [];
@@ -11,8 +36,8 @@ const generateShip = (size, occupiedPositions) => {
 
     while(validPosition){
         const orientation = Math.random() > 0.5 ? 'horizontal' : 'vertical';
-        const startX = Math.ceil(Math.random() * (orientation === 'horizontal' ? 10-size : 9));
-        const startY = Math.ceil(Math.random() * (orientation === 'vertical' ? 10-size : 9));
+        const startX = Math.floor(Math.random() * (orientation === 'horizontal' ? 10-size : 10));
+        const startY = Math.floor(Math.random() * (orientation === 'vertical' ? 10-size : 10));
 
         ship = [];
         for(let i = 0; i < size; i++){
@@ -21,7 +46,7 @@ const generateShip = (size, occupiedPositions) => {
                 y: orientation === 'vertical' ? startY + i : startY
             }
 
-            if(occupiedPositions.some((block) => block.x === newPosition.x && block.y === newPosition.y)){
+            if(isOccupied(newPosition, occupiedPositions)){
                 ship = [];
                 break;
             }
@@ -32,18 +57,31 @@ const generateShip = (size, occupiedPositions) => {
             validPosition = false;
         }
     }
-    ship.forEach(position => occupiedPositions.push(position));
+    ship.forEach((position) => {
+        occupiedPositions.push(position); 
+        unavailablePositions(position, occupiedPositions);
+    });
+
     return ship;    
 }
 
 const generateAllShips = () =>{
     const ships = {};
-    const size = [5, 4, 3, 3, 2, 2, 2, 1, 1, 1];
     const occupiedPositions = [];
+    const sizes = [5, 4, 3, 3, 2, 2, 2, 1, 1, 1];
+    const names = [
+        'firstFive', 'firstfour', 'firstThree', 'secondThree',
+        'firstTwo', 'secondTwo', 'thirdTwo', 'firstOne', 'secondOne',
+        'thirdOne',
+    ]
 
-    for(let i = 0; i < size.length; i++){
-        ships[i] = {coordinates: generateShip(size[i], occupiedPositions)}
-    }
+    sizes.forEach((size, index) => {
+        ships[names[index]] = {
+            coordinates: generateShip(size, occupiedPositions)
+        };
+    });
+
+
     return ships;
 }
 
