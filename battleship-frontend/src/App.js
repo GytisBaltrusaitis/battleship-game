@@ -4,33 +4,28 @@ import React, { useState, useEffect } from 'react';
 
 const Battleship = () => {
 
-  const [ship, setShip] = useState([]);
+  const [ships, setShips] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:5000/ship')
     .then((response) => response.json())
-    .then((data) => setShip(data));
+    .then((data) => setShips(data));
   }, []);
   
   const grid = Array.from({length: 10}, (_, x) =>
     Array.from({length: 10}, (_, y) => ({x, y}))
   );
 
-  const isPartOfShip = (x, y ) => ship.some((block) => block.x === x && block.y ===y);
-
-
-  const orientation = Math.random() > 0.5 ? 'horizontal' : 'vertical';
-  const startX = Math.ceil(Math.random() * (orientation === 'horizontal' ? 5 : 9));
-  const startY = Math.ceil(Math.random() * (orientation === 'vertical' ? 5 : 9));
-
-  for(let i = 0; i < 10000; i++){
-    //console.log(i);
-    if(startX > 9 || startY > 9){
-      console.log("Out of bounds");
+  const isPartOfShips = (x, y, allShips) => {
+    for(let shipIndex in allShips){
+      const ship = allShips[shipIndex].coordinates;
+      if(ship.some((block) => block.x === x && block.y ===y)){
+        return true;
+      }
     }
   }
 
-  //console.log(ship);
+  console.log(ships);
 
   return (
     <div className="App">
@@ -42,7 +37,7 @@ const Battleship = () => {
             style={{
               width: 70,
               height: 70,
-              backgroundColor: isPartOfShip(x, y) ? 'black' : 'white'
+              backgroundColor: isPartOfShips(x, y, ships) ? 'black' : 'white'
             }}
             //onClick={console.log(x, y)}
             >
