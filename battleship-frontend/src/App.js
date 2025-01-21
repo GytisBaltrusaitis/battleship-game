@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 const Battleship = () => {
 
   const [ships, setShips] = useState([]);
+  const [message, setMessage] = useState('');
+  const [shots, setShots] = useState(25);
 
   useEffect(() => {
     fetch('http://localhost:5000/ship')
@@ -29,6 +31,11 @@ const Battleship = () => {
     }
   }
 
+  const attack = (x, y) => {
+    setShots((prevShots) => prevShots -1);
+    setMessage("You missed");
+  }
+
   const isPartOfShips = (x, y, allShips) => {
     for(let shipName in allShips){
       const ship = allShips[shipName].coordinates;
@@ -44,6 +51,7 @@ const Battleship = () => {
   return (
     <div className="App">
       <h1>Battleship Game</h1>
+      <h2>Remaining shots : {shots}</h2>
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
@@ -58,13 +66,16 @@ const Battleship = () => {
             onClick={() => {
               if(shipName){
                 deleteCoordinate(shipName, x, y);
+                setMessage('You hit a ship!');
               }
+              else attack(x, y);
             }}
             >
           </button>
           );
         })}
       </div>
+      <p>{message}</p>
     </div>
   );
 }
