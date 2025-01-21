@@ -9,13 +9,31 @@ const Battleship = () => {
   const [shots, setShots] = useState(25);
   const [missedCoordinates, setMissedCoordinates] = useState([]);
   const [destroyedShipCoordinates, setDestroyedShipCoordinates] = useState([]);
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
-    fetchShips();
-  }, []);
+    if(sessionId){
+      fetchShips();
+    }
+  }, [sessionId]);
+
+  console.log(sessionId);
+  const startGame = async () => {
+    const response = await fetch('http://localhost:5000/startGame', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+    });
+    const data = await response.json();
+    setSessionId(data.sessionId);
+    setShips(data.ships);
+    setShots(25);
+    setMessage("Try to destroy all ships!");
+    setMissedCoordinates([]);
+    setDestroyedShipCoordinates([]);
+  }
 
   const fetchShips = async () => {
-    const response = await fetch('http://localhost:5000/ship');
+    const response = await fetch(`http://localhost:5000/ship/${sessionId}`);
     const data = await response.json();
     setShips(data);
     setShots(25);
@@ -29,7 +47,7 @@ const Battleship = () => {
   );
 
   const deleteCoordinate = async (shipName, x, y) => {
-    const response = await fetch(`http://localhost:5000/ship/${shipName}/delete`, {
+    const response = await fetch(`http://localhost:5000/ship/${sessionId}/${shipName}/delete`, {
       method: 'DELETE',
       headers: { 'content-type': 'application/json'},
       body: JSON.stringify({x, y})
@@ -55,7 +73,8 @@ const Battleship = () => {
   }
 
   const attack = (x, y) => {
-    if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) && shots > 0){
+    if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) 
+      && shots > 0 && (sessionId !== null)){
     setMissedCoordinates((prev) => [...prev, {x, y}]);
     setShots((prevShots) => prevShots -1);
     setMessage("You missed");
@@ -80,7 +99,11 @@ const Battleship = () => {
     <div className="App">
       <h1>Battleship Game</h1>
       <h2>Remaining shots : {shots}</h2>
-      <button onClick={fetchShips}>Reset</button>
+      {!sessionId ? (
+        <button onClick={startGame}>Start Game</button>
+      ) : (
+        <button onClick={startGame}>Restart</button>
+      )}
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
@@ -92,12 +115,11 @@ const Battleship = () => {
             style={{
               width: 70,
               height: 70,
-              backgroundColor: hit ? 'black' : missed ? 'red' : 'white'
+              backgroundColor: shipName ? 'black' : missed ? 'red' : 'white'
             }}
             onClick={() => {
               if(shipName){
                 deleteCoordinate(shipName, x, y);
-                //setMessage('You hit a ship!');
               }
               else attack(x, y);
             }}

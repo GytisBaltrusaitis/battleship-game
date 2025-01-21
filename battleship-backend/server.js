@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const uuid = require('uuid');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+let games = {};
 
 const isOccupied = (position, occupiedPositions) => 
     occupiedPositions.some((occupied) => occupied.x === position.x && occupied.y === position.y);
@@ -87,16 +90,30 @@ const generateAllShips = () =>{
     return ships;
 }
 
-let ships = generateAllShips();
+app.post('/startGame', (req, res) => {
+    const sessionId = uuid.v4();
+    const ships = generateAllShips();
+    games[sessionId] = ships;
+    res.json({sessionId});
+})
 
-app.get('/ship', (req, res) => {
-    ships = generateAllShips();
+app.get('/ship/:sessionId', (req, res) => {
+    const {sessionId} = req.params;
+    const ships = games[sessionId];
+
+    if(!ships){
+        return res.status(404).json({error : 'Game not found'});
+    }
+
     res.json(ships);
 })
 
-app.delete('/ship/:shipName/delete', (req, res) => {
-    const {shipName} = req.params;
+app.delete('/ship/:sessionId/:shipName/delete', (req, res) => {
+    const { sessionId, shipName} = req.params;
     const {x, y} = req.body;
+
+
+    const ships = games[sessionId];
 
     ships[shipName].coordinates = ships[shipName].coordinates.filter(
         (coordinate) => coordinate.x !== x || coordinate.y !== y
