@@ -17,7 +17,7 @@ const Battleship = () => {
     }
   }, [sessionId]);
 
-  console.log(sessionId);
+  //console.log(sessionId);
   const startGame = async () => {
     const response = await fetch('http://localhost:5000/startGame', {
       method: 'POST',
@@ -93,7 +93,7 @@ const Battleship = () => {
     return null;
   }
 
-  console.log(ships);
+  //console.log(ships);
 
   return (
     <div className="App">
@@ -104,7 +104,7 @@ const Battleship = () => {
       ) : (
         <button onClick={startGame}>Restart</button>
       )}
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
+      <div className = 'Battleground' style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
           const missed = checkIfMissedCoordinate(x, y);
@@ -115,7 +115,13 @@ const Battleship = () => {
             style={{
               width: 70,
               height: 70,
-              backgroundColor: shipName ? 'black' : missed ? 'red' : 'white'
+              backgroundColor: hit ? '#353633' : missed ? '#248cd1' : 'white',
+              backgroundImage: 
+              hit ? 'url("/explosion.png")' :
+              missed ? 'url("/splash.png")' : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
             }}
             onClick={() => {
               if(shipName){

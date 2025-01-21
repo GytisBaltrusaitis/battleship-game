@@ -1,4 +1,9 @@
 .App {
-
+    text-align: center;
+}
+.Battleground{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
