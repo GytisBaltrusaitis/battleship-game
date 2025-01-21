@@ -11,10 +11,18 @@ const Battleship = () => {
   const [destroyedShipCoordinates, setDestroyedShipCoordinates] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/ship')
-    .then((response) => response.json())
-    .then((data) => setShips(data));
+    fetchShips();
   }, []);
+
+  const fetchShips = async () => {
+    const response = await fetch('http://localhost:5000/ship');
+    const data = await response.json();
+    setShips(data);
+    setShots(25);
+    setMessage("Try to destroy all ships!");
+    setMissedCoordinates([]);
+    setDestroyedShipCoordinates([]);
+  }
   
   const grid = Array.from({length: 10}, (_, x) =>
     Array.from({length: 10}, (_, y) => ({x, y}))
@@ -27,7 +35,7 @@ const Battleship = () => {
       body: JSON.stringify({x, y})
     });
 
-    if(response.ok){
+    if(response.ok && shots > 0){
       const { message, ships:updatedShips } = await response.json();
       setShips(updatedShips);
       setDestroyedShipCoordinates((prev) => [...prev, {x, y}]);
@@ -72,6 +80,7 @@ const Battleship = () => {
     <div className="App">
       <h1>Battleship Game</h1>
       <h2>Remaining shots : {shots}</h2>
+      <button onClick={fetchShips}>Reset</button>
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
