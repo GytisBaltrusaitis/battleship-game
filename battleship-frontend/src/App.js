@@ -7,6 +7,8 @@ const Battleship = () => {
   const [ships, setShips] = useState([]);
   const [message, setMessage] = useState('');
   const [shots, setShots] = useState(25);
+  const [missedCoordinates, setMissedCoordinates] = useState([]);
+  const [destroyedShipCoordinates, setDestroyedShipCoordinates] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:5000/ship')
@@ -28,12 +30,27 @@ const Battleship = () => {
     if(response.ok){
       const updatedShips = await response.json();
       setShips(updatedShips);
+      setDestroyedShipCoordinates((prev) => [...prev, {x, y}]);
     }
   }
 
+
+  const checkIfMissedCoordinate = (x, y) => {
+    return missedCoordinates.some((coordinate) => coordinate.x === x 
+                                && coordinate.y === y);
+  }
+
+  const checkIfDestroyedShipCoordinate = (x, y) => {
+    return destroyedShipCoordinates.some((coordinate) => coordinate.x === x 
+                                && coordinate.y === y);
+  }
+
   const attack = (x, y) => {
+    if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) && shots > 0){
+    setMissedCoordinates((prev) => [...prev, {x, y}]);
     setShots((prevShots) => prevShots -1);
     setMessage("You missed");
+    }
   }
 
   const isPartOfShips = (x, y, allShips) => {
