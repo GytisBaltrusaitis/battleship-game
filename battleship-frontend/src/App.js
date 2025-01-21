@@ -1,10 +1,24 @@
 import './App.css';
+import React, { useState, useEffect } from 'react';
 
-function App() {
+
+const Battleship = () => {
+
+  const [ship, setShip] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/ship')
+    .then((response) => response.json())
+    .then((data) => setShip(data));
+  }, []);
+  
+  console.log(ship);
 
   const grid = Array.from({length: 10}, (_, x) =>
     Array.from({length: 10}, (_, y) => ({x, y}))
   );
+
+  const isPartOfShip = (x, y ) => ship.some((block) => block.x === x && block.y ===y);
 
   return (
     <div className="App">
@@ -16,8 +30,9 @@ function App() {
             style={{
               width: 70,
               height: 70,
-              backgroundColor: 'white'
+              backgroundColor: isPartOfShip(x, y) ? 'black' : 'white'
             }}
+            //onClick={console.log(x, y)}
             >
           </button>
         ))}
@@ -26,4 +41,4 @@ function App() {
   );
 }
 
-export default App;
+export default Battleship;
