@@ -74,7 +74,7 @@ const Battleship = () => {
     return null;
   }
 
-  //console.log(ships);
+  console.log(ships);
 
   return (
     <div className="App">
@@ -84,13 +84,15 @@ const Battleship = () => {
       <div style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
+          const missed = checkIfMissedCoordinate(x, y);
+          const hit = checkIfDestroyedShipCoordinate(x, y);
           return (
           <button
             key={`${x}-${y}`}
             style={{
               width: 70,
               height: 70,
-              backgroundColor: shipName ? 'black' : 'white'
+              backgroundColor: hit ? 'black' : missed ? 'red' : 'white'
             }}
             onClick={() => {
               if(shipName){
