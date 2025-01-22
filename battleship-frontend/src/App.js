@@ -78,7 +78,10 @@ const Battleship = () => {
       && shots > 0 && (sessionId !== null)){
     setMissedCoordinates((prev) => [...prev, {x, y}]);
     setShots((prevShots) => prevShots -1);
-    setMessage("You missed");
+    setMessage("You missed!");
+    if(shots === 1){
+        setMessage("Game over!");
+      }
     }
   }
 
@@ -122,8 +125,8 @@ const Battleship = () => {
 
   return (
     <div className="App">
-      <h1>Battleship Game</h1>
-      <h2>Remaining shots : {shots}</h2>
+      <h1 className='gameName'>Battleship Game</h1>
+      <h2 className='remainingShots'>Remaining shots : {shots}</h2>
       {!sessionId ? (
         <button className='glowbutton' onClick={startGame}><b>Start Game</b></button>
       ) : (
@@ -134,8 +137,9 @@ const Battleship = () => {
           const shipName = isPartOfShips(x, y, ships);
           const missed = checkIfMissedCoordinate(x, y);
           const hit = checkIfDestroyedShipCoordinate(x, y);
-
           const currentState = gifState[`${x}-${y}`];
+
+          const isGameOver = shots === 0 && Object.values(ships).some(ship => ship.coordinates.some(coordinate => coordinate.x === x && coordinate.y === y));
 
           return (
           <button
@@ -143,7 +147,7 @@ const Battleship = () => {
             style={{
               width: 70,
               height: 70,
-              backgroundColor: hit ? '#353633' : missed ? '#248cd180' : '#248cd1AA',
+              backgroundColor: hit ? '#353633' : missed ? '#248cd180' : (isGameOver ? '#353633' : '#248cd180'),
               backgroundImage: 
               currentState === 'gif'
               ? 'url("/droplet.gif")' : currentState === 'image' ?
@@ -160,7 +164,7 @@ const Battleship = () => {
           );
         })}
       </div>
-      <p>{message}</p>
+      <p className='message'>{message}</p>
     </div>
   );
 }

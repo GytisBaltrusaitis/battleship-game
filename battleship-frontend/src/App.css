@@ -9,6 +9,30 @@ body{
 .App {
     text-align: center;
 }
+.message{
+    font-family: "Bebas Neue", serif;
+    font-weight: 400;
+    margin: 10px;
+    font-style: normal;
+    color: beige;
+    font-size: 26px;
+}
+.gameName{
+    font-family: "Bebas Neue", serif;
+    font-weight: 400;
+    margin: 0px;
+    font-style: normal;
+    color: rgb(37, 37, 37);
+    font-size: 60px;
+}
+.remainingShots{
+    font-family: "Bebas Neue", serif;
+    font-weight: 400;
+    margin: 0px;
+    font-style: normal;
+    color: rgb(58, 58, 58);
+    font-size: 30px;
+}
 .Battleground{
     display: flex;
     align-items: center;
@@ -27,8 +51,8 @@ body{
     position: relative;
     overflow: hidden;
     z-index: 1;
-    box-shadow: 6px 6px 12px #8acaff,
-                -6px -6px 12px #8acaff;
+    box-shadow: 6px 6px 12px #8acaff80,
+                -6px -6px 12px #8acaff80;
 }
    
 .glowbutton::before {
@@ -39,7 +63,7 @@ body{
     position: absolute;
     top: 0;
     left: 0;
-    background-image: linear-gradient(to right, #17a79f 0%, #114ca5 100%);
+    background-image: linear-gradient(to right, #17a79f80 0%, #114ca580 100%);
     transition: .5s ease;
     display: block;
     z-index: -1;

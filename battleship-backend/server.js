@@ -123,7 +123,7 @@ app.delete('/ship/:sessionId/:shipName/delete', (req, res) => {
         return res.json({ message: `You drowned a: ${shipName}!`, ships});
     }
 
-    res.json({message: 'You hit a ship', ships});
+    res.json({message: 'You hit a ship!', ships});
 })
 
 const PORT = 5000;
