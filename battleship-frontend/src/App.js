@@ -146,6 +146,7 @@ const Battleship = () => {
             alt="Game Over!"
             style={{
               position: 'absolute',
+              objectFit: 'cover',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
