@@ -95,7 +95,8 @@ const Battleship = () => {
   }
 
   const handleClick = (x, y, shipName) => {
-      if(sessionId !== null){
+      if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) 
+        && shots > 0 && (sessionId !== null)){
       setGifState((prevState) => ({
         ...prevState,
         [`${x}-${y}`]: 'gif'
@@ -124,9 +125,9 @@ const Battleship = () => {
       <h1>Battleship Game</h1>
       <h2>Remaining shots : {shots}</h2>
       {!sessionId ? (
-        <button onClick={startGame}>Start Game</button>
+        <button className='glowbutton' onClick={startGame}><b>Start Game</b></button>
       ) : (
-        <button onClick={startGame}>Restart</button>
+        <button className='glowbutton' onClick={startGame}><b>Restart</b></button>
       )}
       <div className = 'Battleground' style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
         {grid.flat().map(({x, y}) => {

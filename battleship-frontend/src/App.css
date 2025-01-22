@@ -14,4 +14,38 @@ body{
     align-items: center;
     justify-content: center;
 }
-
+/* Taken from uiverse.io */ 
+.glowbutton {
+    width: 9em;
+    height: 3em;
+    border-radius: 30em;
+    margin: 10px;
+    padding: 0;
+    font-size: 15px;
+    font-family: inherit;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 6px 6px 12px #8acaff,
+                -6px -6px 12px #8acaff;
+}
+   
+.glowbutton::before {
+    content: '';
+    width: 0;
+    height: 3em;
+    border-radius: 30em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: linear-gradient(to right, #17a79f 0%, #114ca5 100%);
+    transition: .5s ease;
+    display: block;
+    z-index: -1;
+}
+   
+.glowbutton:hover::before {
+    width: 9em;
+}
+  
