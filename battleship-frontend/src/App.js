@@ -47,6 +47,10 @@ const Battleship = () => {
     Array.from({length: 10}, (_, y) => ({x, y}))
   );
 
+  const isGameOver = shots === 0 && destroyedShipCoordinates.length < 24;
+  const isGameWon = shots > 0 && destroyedShipCoordinates.length === 24;
+
+
   const deleteCoordinate = async (shipName, x, y) => {
     const response = await fetch(`http://localhost:5000/ship/${sessionId}/${shipName}/delete`, {
       method: 'DELETE',
@@ -54,11 +58,14 @@ const Battleship = () => {
       body: JSON.stringify({x, y})
     });
 
-    if(response.ok && shots > 0){
+    if(response.ok && shots > 0 && !isGameWon){
       const { message, ships:updatedShips } = await response.json();
       setShips(updatedShips);
       setDestroyedShipCoordinates((prev) => [...prev, {x, y}]);
       setMessage(message);
+      if(destroyedShipCoordinates.length === 23){
+        setMessage('You Won!');
+      }
     }
   }
 
@@ -75,7 +82,7 @@ const Battleship = () => {
 
   const attack = (x, y) => {
     if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) 
-      && shots > 0 && (sessionId !== null)){
+      && shots > 0 && (sessionId !== null) && !isGameWon){
     setMissedCoordinates((prev) => [...prev, {x, y}]);
     setShots((prevShots) => prevShots -1);
     setMessage("You missed!");
@@ -99,7 +106,7 @@ const Battleship = () => {
 
   const handleClick = (x, y, shipName) => {
       if(!checkIfMissedCoordinate(x, y) && !checkIfDestroyedShipCoordinate(x, y) 
-        && shots > 0 && (sessionId !== null)){
+        && shots > 0 && (sessionId !== null) && !isGameWon){
       setGifState((prevState) => ({
         ...prevState,
         [`${x}-${y}`]: 'gif'
@@ -133,6 +140,36 @@ const Battleship = () => {
         <button className='glowbutton' onClick={startGame}><b>Restart</b></button>
       )}
       <div className = 'Battleground' style={{display: 'grid', gridTemplateColumns: 'repeat(10, 70px)' }}>
+        {isGameOver && (
+          <img
+            src="/gameover.gif"
+            alt="Game Over!"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '500px',
+              height: 'auto',
+              opacity: '0.85',
+            }}
+          />
+        )}
+        {isGameWon && (
+          <img
+            src="/gamewin.gif"
+            alt="Game Over!"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '600px',
+              height: 'auto',
+              opacity: '0.85',
+            }}
+          />
+        )}
         {grid.flat().map(({x, y}) => {
           const shipName = isPartOfShips(x, y, ships);
           const missed = checkIfMissedCoordinate(x, y);
