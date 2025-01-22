@@ -10,6 +10,7 @@ const Battleship = () => {
   const [missedCoordinates, setMissedCoordinates] = useState([]);
   const [destroyedShipCoordinates, setDestroyedShipCoordinates] = useState([]);
   const [sessionId, setSessionId] = useState(null);
+  const [gifState, setGifState] = useState({});
 
   useEffect(() => {
     if(sessionId){
@@ -93,6 +94,29 @@ const Battleship = () => {
     return null;
   }
 
+  const handleClick = (x, y, shipName) => {
+      if(sessionId !== null){
+      setGifState((prevState) => ({
+        ...prevState,
+        [`${x}-${y}`]: 'gif'
+      }))
+
+      if(shipName){
+        deleteCoordinate(shipName, x, y);
+      } else{
+        attack(x, y);
+      }
+
+      setTimeout(() => {
+        setGifState((prevState) => ({
+          ...prevState,
+          [`${x}-${y}`]: 'image',
+        }))
+      }, 1000);
+    }
+  }
+
+
   //console.log(ships);
 
   return (
@@ -109,26 +133,27 @@ const Battleship = () => {
           const shipName = isPartOfShips(x, y, ships);
           const missed = checkIfMissedCoordinate(x, y);
           const hit = checkIfDestroyedShipCoordinate(x, y);
+
+          const currentState = gifState[`${x}-${y}`];
+
           return (
           <button
             key={`${x}-${y}`}
             style={{
               width: 70,
               height: 70,
-              backgroundColor: hit ? '#353633' : missed ? '#248cd1' : 'white',
+              backgroundColor: hit ? '#353633' : missed ? '#248cd180' : '#248cd1AA',
               backgroundImage: 
+              currentState === 'gif'
+              ? 'url("/droplet.gif")' : currentState === 'image' ?
               hit ? 'url("/explosion.png")' :
-              missed ? 'url("/splash.png")' : 'none',
+              missed ? 'url("/splash.png")' : 'none'
+              : 'none',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
             }}
-            onClick={() => {
-              if(shipName){
-                deleteCoordinate(shipName, x, y);
-              }
-              else attack(x, y);
-            }}
+            onClick={() => handleClick(x, y, shipName)}
             >
           </button>
           );
